@@ -1,6 +1,9 @@
-frontend-nanodegree-arcade-game
+p3
 ===============================
 
-Students should use this rubric: https://www.udacity.com/course/viewer#!/c-ud015/l-3072058665/m-3072588797
+Udacity Front-End Web Developer Nanodegree Project 3
 
-for self-checking their submission.
+#Instructions
+1.
+2.
+3.
