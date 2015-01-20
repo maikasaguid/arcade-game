@@ -72,6 +72,8 @@ Enemy.prototype.reset = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function() {
+    this.blockX = 2;
+    this.blockY = 5;
     this.lives = 4;
     this.paddingLeft = 18;
     this.paddingRight = 17;
@@ -96,6 +98,12 @@ Player.prototype.winner = function() {
 
 Player.prototype.render = function() {
     var offsetY = 10;
+    var heartImg = 'images/Heart.png';
+    var width = 50;
+
+    for(var i=0; i<this.lives; i++) {
+        ctx.drawImage(Resources.get(heartImg), i * width, 540, width, width);
+    }
 
     ctx.drawImage(Resources.get(this.sprite), this.x, (this.y - offsetY));
 
@@ -122,10 +130,8 @@ Player.prototype.collisionDetection = function() {
             enemyHitLeft = allEnemies[i].x + allEnemies[i].paddingLeft;
             enemyHitRight = allEnemies[i].x + imageWidth - allEnemies[i].paddingRight;
 
-            if((playerHitLeft <= enemyHitRight) && (playerHitLeft >= enemyHitLeft)) {
-                this.reset();
-            }
-            if((playerHitRight >= enemyHitLeft) && (playerHitRight <= enemyHitRight)) {
+            if(((playerHitLeft <= enemyHitRight) && (playerHitLeft >= enemyHitLeft)) || ((playerHitRight >= enemyHitLeft) && (playerHitRight <= enemyHitRight))) {
+                this.lives--;
                 this.reset();
             }
         }
@@ -173,14 +179,12 @@ Player.prototype.handleInput = function(key) {
 
 var Boy = function() {
     Player.call(this);
-
     this.sprite = 'images/char-boy.png';
 };
 Boy.prototype = Object.create(Player.prototype);
 
 var BoyBig = function() {
     Player.call(this);
-
     this.lives = 6;
     this.paddingLeft = 2;
     this.paddingRight = 1;
@@ -190,14 +194,12 @@ BoyBig.prototype = Object.create(Player.prototype);
 
 var GirlCat = function() {
     Player.call(this);
-
     this.sprite = 'images/char-cat-girl.png';
 };
 GirlCat.prototype = Object.create(Player.prototype);
 
 var GirlHorn = function() {
     Player.call(this);
-
     this.lives = 5;
     this.paddingLeft = 7;
     this.sprite = 'images/char-horn-girl.png';
@@ -206,7 +208,6 @@ GirlHorn.prototype = Object.create(Player.prototype);
 
 var GirlPrincess = function() {
     Player.call(this);
-
     this.paddingLeft = 14;
     this.paddingRight = 14;
     this.sprite = 'images/char-princess-girl.png';
@@ -215,7 +216,6 @@ GirlPrincess.prototype = Object.create(Player.prototype);
 
 var GirlPink = function() {
     Player.call(this);
-    
     this.paddingLeft = 14;
     this.paddingRight = 13;
     this.sprite = 'images/char-pink-girl.png';
