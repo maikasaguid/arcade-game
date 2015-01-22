@@ -1,16 +1,24 @@
-var imageWidth = 101;
-var rawImageHeight = 171;
-var imagePaddingTop = 88;
-var imageHeight = rawImageHeight - imagePaddingTop;
+var imageWidth = 101,
+    rawImageHeight = 171,
+    imagePaddingTop = 88,
+    imageHeight = rawImageHeight - imagePaddingTop;
 
-var maxEnemies = 5;
-var lastBlockY = 2;
-var minSpeed = 40;
-var level = 1;
-var paused = 0;
+var maxEnemies = 5,
+    lastBlockY = 2,
+    minSpeed = 40,
+    level = 1,
+    paused = 0;
 
 var moves = 0;
-var totalMoves = 0;
+
+var canvas2 = document.createElement('canvas'),
+    ctx2 = canvas2.getContext('2d');
+
+canvas2.width = 505;
+canvas2.height = 606;
+canvas2.setAttribute("class", "stats");
+document.getElementById('game').appendChild(canvas2);
+
 
 // Enemies our player must avoid
 var Enemy = function() {
@@ -74,6 +82,7 @@ Enemy.prototype.reset = function() {
 var Player = function() {
     this.blockX = 2;
     this.blockY = 5;
+    this.level = 1;
     this.lives = 4;
     this.paddingLeft = 18;
     this.paddingRight = 17;
@@ -92,8 +101,11 @@ Player.prototype.update = function() {
 };
 
 Player.prototype.winner = function() {
-    ctx.fillText("You've won in " + moves + " moves!", 10, 50);
+    ctx2.font = "40px Arial";
+    ctx2.fillStyle = "black";
+    ctx2.fillText("Level " + level + " complete!", 100, 50);
     this.reset();
+    this.level++;
 };
 
 Player.prototype.render = function() {
@@ -105,6 +117,16 @@ Player.prototype.render = function() {
         ctx.drawImage(Resources.get(heartImg), i * width, 540, width, width);
     }
 
+    var message = "LEVEL " + this.level;
+
+    ctx2.clearRect(5, (imageHeight * 7) - 60, 100, 25);
+    ctx2.font = "20px Arial";
+    ctx2.lineWidth = 2;
+    ctx2.strokeStyle = "green";
+    ctx2.strokeText(message, 5, (imageHeight * 7) - 40);
+    ctx2.fillStyle = "white";
+    ctx2.fillText("LEVEL " + this.level, 5, (imageHeight * 7) - 40);
+
     ctx.drawImage(Resources.get(this.sprite), this.x, (this.y - offsetY));
 
     if(this.blockY === 0) {
@@ -115,7 +137,6 @@ Player.prototype.render = function() {
 Player.prototype.reset = function() {
     this.blockX = 2;
     this.blockY = 5;
-    totalMoves += moves;
     moves = 0;
 };
 
