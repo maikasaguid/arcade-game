@@ -61,7 +61,7 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.render = function() {
     var offset = 25;
 
-    if(!paused) ctx.drawImage(Resources.get(this.sprite), this.x, (this.y - offset));
+    ctx.drawImage(Resources.get(this.sprite), this.x, (this.y - offset));
 };
 
 //Reset Enemy position
@@ -83,7 +83,6 @@ Enemy.prototype.reset = function() {
 var Player = function() {
     this.blockX = 2;
     this.blockY = 5;
-    this.level = 1;
     this.lives = 4;
     this.paddingLeft = 18;
     this.paddingRight = 17;
@@ -97,16 +96,8 @@ Player.prototype.update = function() {
 
         this.collisionDetection();
 
-        if(this.blockY === 0 && moves >= 5) this.winner();
+        if(this.blockY === 0 && moves >= 5) gameLevel(); //beat the level
     }
-};
-
-Player.prototype.winner = function() {
-    ctx2.font = "40px Arial";
-    ctx2.fillStyle = "black";
-    ctx2.fillText("Level " + level + " complete!", 100, 50);
-    this.reset();
-    this.level++;
 };
 
 Player.prototype.render = function() {
@@ -115,7 +106,7 @@ Player.prototype.render = function() {
     var heartImg = 'images/Heart.png',
         heartWidth = 50;
 
-    var message = "LEVEL " + this.level;
+    var message = "LEVEL " + level;
 
     if(mode == 2) {
         for(var i=0; i<this.lives; i++) {
@@ -154,7 +145,9 @@ Player.prototype.collisionDetection = function() {
 
             if(((playerHitLeft <= enemyHitRight) && (playerHitLeft >= enemyHitLeft)) || ((playerHitRight >= enemyHitLeft) && (playerHitRight <= enemyHitRight))) {
                 this.lives--;
-                this.reset();
+
+                if(this.lives > 0) this.reset();
+                else gameEnd();
             }
         }
     }
@@ -184,11 +177,7 @@ Player.prototype.handleInput = function(key) {
                     break;
             }
 
-            if(key >= 1 && key <= 6) {
-                mode = 2;
-                paused = 0;
-                ctx2.clearRect (0, 0, canvas2.width, canvas2.height);
-            }
+            if(key >= 1 && key <= 6) gameStart();
 
             break;
         case 2:
@@ -214,9 +203,6 @@ Player.prototype.handleInput = function(key) {
                         else this.blockY += 1;
                         moves++;
                         break;
-                    case 'restart':
-                        gameReset();
-                        break;
                     case 'pause':
                         paused = (paused + 1) % 2;
                         break;
@@ -234,6 +220,13 @@ Player.prototype.handleInput = function(key) {
             }
             break;
         case 3:
+            switch(key) {
+                case 'enter':
+                    gameReset();
+                    paused = 0;
+                    mode = 2;
+                    break;
+            }
             break;
     }
 };
@@ -290,7 +283,7 @@ var player = new Player();
 var allEnemies = [];
 
 gameReset();
-
+paused = 1;
 
 function gameReset() {
     player.reset();
@@ -299,6 +292,8 @@ function gameReset() {
         allEnemies[i] = new Enemy();
         allEnemies[i].reset();
     }
+
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear entire canvas
 }
 
 function gameChoose() {
@@ -348,6 +343,28 @@ function gameChoose() {
     ctx2.textAlign = "center";
     ctx2.fillStyle = "black";
     ctx2.fillText(message, canvas2.width / 2, charY + 35);
+}
+
+function gameStart() {
+    mode = 2;
+    paused = 0;
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear entire canvas
+}
+function gameLevel() {
+    mode = 3;
+    paused = 1;
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear entire canvas
+
+    ctx2.font = "bold 36px Arial";
+    ctx2.textAlign = "center";
+    ctx2.fillStyle = "black";
+    ctx2.fillText("Level " + level + " complete!", canvas2.width / 2, 200);
+    ctx2.font = "bold 16px Arial";
+    ctx2.fillText("Press return/enter to continue...", canvas2.width / 2, 250);
+
+    level++;
+    maxEnemies++;
+    minSpeed+=10;
 }
 
 function gameEnd() {
