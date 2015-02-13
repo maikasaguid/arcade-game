@@ -6,8 +6,9 @@ var imageWidth = 101,
 var maxEnemies = 5,
     lastBlockY = 2,
     minSpeed = 40,
-    level = 1,
+    level = 0,
     paused = 1;
+    countdown = 0;
     mode = 1;
 
 var moves = 0;
@@ -181,7 +182,7 @@ Player.prototype.handleInput = function(key) {
 
             break;
         case 2:
-            if(!paused) {
+            if(!paused && !countdown) {
                 switch(key) {
                     case 'left':
                         if (this.blockX === 0) this.blockX = 0;
@@ -222,9 +223,10 @@ Player.prototype.handleInput = function(key) {
         case 3:
             switch(key) {
                 case 'enter':
-                    gameReset();
-                    paused = 0;
                     mode = 2;
+
+                    gameReset();
+                    gameCountdown();
                     break;
             }
             break;
@@ -283,7 +285,6 @@ var player = new Player();
 var allEnemies = [];
 
 gameReset();
-paused = 1;
 
 function gameReset() {
     player.reset();
@@ -293,7 +294,15 @@ function gameReset() {
         allEnemies[i].reset();
     }
 
-    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear entire canvas
+    ctx2.clearRect(0, 0, canvas2.width, canvas2.height); //clear stats canvas
+    
+    if(level === 0) {
+        paused = 1;
+        level = 1;
+    }
+    else {
+        paused = 0;
+    }
 }
 
 function gameChoose() {
@@ -307,7 +316,6 @@ function gameChoose() {
             new GirlPrincess()
         ],
         [
-            
             new GirlCat(),
             new GirlPink()
         ]
@@ -319,7 +327,6 @@ function gameChoose() {
         charY = 0;
     var message = "Select your character (1-6)";
 
-    
     ctx2.font = "50px Arial";
     ctx2.lineWidth = 1;
     ctx2.strokeStyle = "gray";
@@ -345,16 +352,40 @@ function gameChoose() {
     ctx2.fillText(message, canvas2.width / 2, charY + 35);
 }
 
+function gameCountdown() {
+    var countdownNum = 3;
+    countdown = 1;
+
+    var timer = setInterval(function() {
+        ctx2.clearRect((canvas2.width / 2) - 20, 390, 40, 60); //clear countdown numbers
+        ctx2.font = "60px Arial";
+        ctx2.textAlign = "center";
+        ctx2.fillStyle = "white";
+
+        if(countdownNum <= 0) {
+            clearInterval(timer);
+            countdown = 0;
+        }
+        else {
+            ctx2.fillText(countdownNum, canvas2.width / 2, 440);
+            countdownNum--;
+        }
+    }, 1000);
+}
+
 function gameStart() {
     mode = 2;
     paused = 0;
-    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear entire canvas
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear stats canvas
+
+    gameCountdown();
 }
+
 function gameLevel() {
     mode = 3;
     paused = 1;
-    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear entire canvas
 
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear stats canvas
     ctx2.font = "bold 36px Arial";
     ctx2.textAlign = "center";
     ctx2.fillStyle = "black";
