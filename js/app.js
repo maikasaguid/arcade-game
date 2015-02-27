@@ -1,24 +1,22 @@
-var imageWidth = 101,
-    rawImageHeight = 171,
+var imageHeightRaw = 171,
     imagePaddingTop = 88,
-    imageHeight = rawImageHeight - imagePaddingTop;
+    imageHeight = imageHeightRaw - imagePaddingTop;
 
-var maxEnemies = 5,
+var maxEnemies = 8,
     lastBlockY = 2,
-    minSpeed = 40,
+    minSpeed = 20,
     level = 0,
-    paused = 1;
-    countdown = 0;
+    winLevel = 10,
+    paused = 1,
+    countdown = 0,
     mode = 1;
-
-var moves = 0;
 
 var canvas2 = document.createElement('canvas'),
     ctx2 = canvas2.getContext('2d');
 
-canvas2.width = 505;
-canvas2.height = 606;
-canvas2.setAttribute("class", "stats");
+canvas2.width = numCols * imageWidth;
+canvas2.height = numRows * imageHeightCanvas;
+canvas2.setAttribute("class", "top");
 document.getElementById('game').appendChild(canvas2);
 
 
@@ -67,7 +65,7 @@ Enemy.prototype.render = function() {
 
 //Reset Enemy position
 Enemy.prototype.reset = function() {
-    this.x = Math.floor(Math.random() * -505) - 101;
+    this.x = Math.floor(Math.random() * -1010) - imageWidth;
     this.blockY = Math.floor((Math.random() * 3) + 1);
     this.speed = Math.floor((Math.random() * 100) + minSpeed);
 
@@ -97,7 +95,7 @@ Player.prototype.update = function() {
 
         this.collisionDetection();
 
-        if(this.blockY === 0 && moves >= 5) gameLevel(); //beat the level
+        if(this.blockY === 0) gameLevel(); //beat the level
     }
 };
 
@@ -130,7 +128,6 @@ Player.prototype.render = function() {
 Player.prototype.reset = function() {
     this.blockX = 2;
     this.blockY = 5;
-    moves = 0;
 };
 
 Player.prototype.collisionDetection = function() {
@@ -187,47 +184,53 @@ Player.prototype.handleInput = function(key) {
                     case 'left':
                         if (this.blockX === 0) this.blockX = 0;
                         else this.blockX -= 1;
-                        moves++;
                         break;
                     case 'up':
                         if(this.blockY === 0) this.blockY = 0;
                         else this.blockY -= 1;
-                        moves++;
                         break;
                     case 'right':
                         if(this.blockX === 4) this.blockX = 4;
                         else this.blockX += 1;
-                        moves++;
                         break;
                     case 'down':
                         if(this.blockY === 5) this.blockY = 5;
                         else this.blockY += 1;
-                        moves++;
                         break;
                     case 'pause':
-                        paused = (paused + 1) % 2;
+                        paused = 1;
+                        gamePaused();
                         break;
                 }
             }
             else {
                 switch(key) {
                     case 'restart':
-                        gameReset();
+                        if(!countdown) {
+                            gameReset();
+                            gameChoose();
+                        }
                         break;
                     case 'pause':
-                        paused = (paused + 1) % 2;
+                        paused = 0;
+                        if(!countdown) {
+                            ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
+                        }
                         break;
                 }
             }
             break;
         case 3:
-            switch(key) {
-                case 'enter':
-                    mode = 2;
-
-                    gameReset();
-                    gameCountdown();
-                    break;
+            if(key === 'enter') {
+                gameReset();
+                mode = 2;
+                gameCountdown();
+            }
+            break;
+        case 4: //End of Game
+            if(key === 'enter') {
+                gameReset();
+                gameChoose();
             }
             break;
     }
@@ -294,7 +297,7 @@ function gameReset() {
         allEnemies[i].reset();
     }
 
-    ctx2.clearRect(0, 0, canvas2.width, canvas2.height); //clear stats canvas
+    ctx2.clearRect(0, 0, canvas2.width, canvas2.height); //clear top canvas
     
     if(level === 0) {
         paused = 1;
@@ -325,17 +328,19 @@ function gameChoose() {
     var charNum = 1,
         charX = 0,
         charY = 0;
-    var message = "Select your character (1-6)";
+
+    mode = 1;
+    paused = 1;
 
     ctx2.font = "50px Arial";
     ctx2.lineWidth = 1;
     ctx2.strokeStyle = "gray";
     ctx2.fillStyle = "white";
 
-    for(var y=0; y<2; y++) {
+    for(var y=0; y<2; y++) { //Display all characters with numbers to choose from
         for(var x=0; x<3; x++) {
             charX = xOffset + (x * imageWidth);
-            charY = yOffset + (y * rawImageHeight);
+            charY = yOffset + (y * imageHeightRaw);
 
             ctx2.drawImage(Resources.get(allCharacters[x][y].sprite), charX, charY);
 
@@ -349,18 +354,20 @@ function gameChoose() {
     ctx2.font = "bold 36px Arial";
     ctx2.textAlign = "center";
     ctx2.fillStyle = "black";
-    ctx2.fillText(message, canvas2.width / 2, charY + 35);
+    ctx2.fillText("Select your character (1-6)", canvas2.width / 2, charY + 35);
 }
 
 function gameCountdown() {
     var countdownNum = 3;
-    countdown = 1;
+    countdown = 1; //set flag
 
     var timer = setInterval(function() {
         ctx2.clearRect((canvas2.width / 2) - 20, 390, 40, 60); //clear countdown numbers
         ctx2.font = "60px Arial";
         ctx2.textAlign = "center";
         ctx2.fillStyle = "white";
+        ctx2.lineWidth = 1;
+        ctx2.strokeStyle = "green";
 
         if(countdownNum <= 0) {
             clearInterval(timer);
@@ -368,6 +375,7 @@ function gameCountdown() {
         }
         else {
             ctx2.fillText(countdownNum, canvas2.width / 2, 440);
+            ctx2.strokeText(countdownNum, canvas2.width / 2, 440);
             countdownNum--;
         }
     }, 1000);
@@ -376,30 +384,89 @@ function gameCountdown() {
 function gameStart() {
     mode = 2;
     paused = 0;
-    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear stats canvas
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
 
     gameCountdown();
 }
 
 function gameLevel() {
+    var message;
     mode = 3;
-    paused = 1;
+    paused = 1; //set flag
 
-    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear stats canvas
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
     ctx2.font = "bold 36px Arial";
     ctx2.textAlign = "center";
-    ctx2.fillStyle = "black";
-    ctx2.fillText("Level " + level + " complete!", canvas2.width / 2, 200);
-    ctx2.font = "bold 16px Arial";
-    ctx2.fillText("Press return/enter to continue...", canvas2.width / 2, 250);
+    ctx2.lineWidth = 1;
+    ctx2.strokeStyle = "gray";
 
-    level++;
-    maxEnemies++;
-    minSpeed+=10;
+    if(level === winLevel) {
+        message = "You've won the game!";
+        ctx2.fillText(message, canvas2.width / 2, 200);
+        ctx2.strokeText(message, canvas2.width / 2, 200);
+
+        mode = 4;
+    }
+    else {
+        message = "Level " + level + " complete!";
+        ctx2.fillText(message, canvas2.width / 2, 200);
+        ctx2.strokeText(message, canvas2.width / 2, 200);
+
+        level++;
+        maxEnemies+=2;
+        minSpeed+=20;
+    }
+
+    message = "Press return/enter to continue...";
+    ctx2.font = "bold 16px Arial";
+    ctx2.lineWidth = 2;
+    ctx2.strokeStyle = "black";
+    ctx2.strokeText(message, canvas2.width / 2, 250);
+    ctx2.fillText(message, canvas2.width / 2, 250);
 }
 
 function gameEnd() {
+    var message;
 
+    mode = 4;
+    paused = 1; //set flag
+    level = 1;
+
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
+    ctx2.font = "bold 36px Arial";
+    ctx2.textAlign = "center";
+    ctx2.lineWidth = 1;
+    ctx2.strokeStyle = "gray";
+    message = "You've lost the game.";
+    ctx2.fillText(message, canvas2.width / 2, 200);
+    ctx2.strokeText(message, canvas2.width / 2, 200);
+
+    ctx2.font = "bold 16px Arial";
+    ctx2.lineWidth = 2;
+    ctx2.strokeStyle = "black";
+    message = "Press return/enter to continue...";
+    ctx2.strokeText(message, canvas2.width / 2, 250);
+    ctx2.fillText(message, canvas2.width / 2, 250);
+}
+
+function gamePaused() {
+    var message;
+
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
+    ctx2.font = "bold 36px Arial";
+    ctx2.textAlign = "center";
+    ctx2.lineWidth = 1;
+    ctx2.strokeStyle = "gray";
+    message = "PAUSED";
+    ctx2.fillText(message, canvas2.width / 2, 200);
+    ctx2.strokeText(message, canvas2.width / 2, 200);
+
+    ctx2.font = "bold 16px Arial";
+    ctx2.lineWidth = 2;
+    ctx2.strokeStyle = "black";
+    message = "Press 'P' to unpause or 'R' to restart the game.";
+    ctx2.strokeText(message, canvas2.width / 2, 250);
+    ctx2.fillText(message, canvas2.width / 2, 250);
 }
 
 // This listens for key presses and sends the keys to your
