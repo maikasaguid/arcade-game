@@ -11,6 +11,6 @@ canvas {
     width: 505px;
 }
 
-.stats {
+.top {
     z-index: 1;
 }
