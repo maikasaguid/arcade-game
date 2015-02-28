@@ -11,6 +11,10 @@ Get your character across the stone road and into the water without getting hit 
 2. Navigate through the bugs to get to the water by using your left hand (W-up, D-right, S-down, A-left) or right hand arrow buttons.
 3. You win the game once you reach the water in the 10th level.
 
+
+##Instructions for Reviewers
+Please set the variable level in app.js to -1 in order to quickly test the win case.
+
 ##Resources
 1.  Keyboard Keys and Key Code Values
     http://help.adobe.com/en_US/AS2LCR/Flash_10.0/help.html?content=00000520.html
