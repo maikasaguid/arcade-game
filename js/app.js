@@ -2,14 +2,14 @@ var imageHeightRaw = 171,
     imagePaddingTop = 88,
     imageHeight = imageHeightRaw - imagePaddingTop;
 
-var maxEnemies = 8,
-    lastBlockY = 2,
-    minSpeed = 20,
-    level = 0,
-    winLevel = 10,
-    paused = 1,
-    countdown = 0,
-    mode = 1;
+var winLevel = 10,
+    level = -1;
+
+var maxEnemies,
+    minSpeed,
+    paused,
+    countdown,
+    mode;
 
 var canvas2 = document.createElement('canvas'),
     ctx2 = canvas2.getContext('2d');
@@ -65,6 +65,8 @@ Enemy.prototype.render = function() {
 
 //Reset Enemy position
 Enemy.prototype.reset = function() {
+    var lastBlockY = 2;
+
     this.x = Math.floor(Math.random() * -1010) - imageWidth;
     this.blockY = Math.floor((Math.random() * 3) + 1);
     this.speed = Math.floor((Math.random() * 100) + minSpeed);
@@ -198,40 +200,32 @@ Player.prototype.handleInput = function(key) {
                         else this.blockY += 1;
                         break;
                     case 'pause':
-                        paused = 1;
                         gamePaused();
                         break;
                 }
             }
             else {
-                switch(key) {
-                    case 'restart':
-                        if(!countdown) {
-                            gameReset();
-                            gameChoose();
-                        }
-                        break;
-                    case 'pause':
-                        paused = 0;
-                        if(!countdown) {
+                if(!countdown) {
+                    switch(key) {
+                        case 'restart':
+                            gameRestart();
+                            break;
+                        case 'pause':
+                            paused = 0;
                             ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
-                        }
-                        break;
+                            break;
+                    }
                 }
             }
             break;
-        case 3:
+        case 3: //Completed Level
             if(key === 'enter') {
                 gameReset();
-                mode = 2;
                 gameCountdown();
             }
             break;
         case 4: //End of Game
-            if(key === 'enter') {
-                gameReset();
-                gameChoose();
-            }
+            if(key === 'enter') gameRestart();
             break;
     }
 };
@@ -281,15 +275,23 @@ var GirlPink = function() {
 };
 GirlPink.prototype = Object.create(Player.prototype);
 
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
-var player = new Player();
-var allEnemies = [];
+function gameRestart() {
+    maxEnemies = 8;
+    minSpeed = 20;
+    paused = 1;
+    countdown = 0;
+    mode = 1;
 
-gameReset();
+    gameReset();
+    
+    if(level > 0) gameChoose();
+
+    if(level === -1) level = winLevel; //Testing last level
+    else level = 1;
+}
 
 function gameReset() {
+    allEnemies = [];
     player.reset();
 
     for(var i = 0; i < maxEnemies; i++) {
@@ -299,13 +301,7 @@ function gameReset() {
 
     ctx2.clearRect(0, 0, canvas2.width, canvas2.height); //clear top canvas
     
-    if(level === 0) {
-        paused = 1;
-        level = 1;
-    }
-    else {
-        paused = 0;
-    }
+    if(level > 1) paused = 0;
 }
 
 function gameChoose() {
@@ -329,7 +325,6 @@ function gameChoose() {
         charX = 0,
         charY = 0;
 
-    mode = 1;
     paused = 1;
 
     ctx2.font = "50px Arial";
@@ -360,6 +355,7 @@ function gameChoose() {
 function gameCountdown() {
     var countdownNum = 3;
     countdown = 1; //set flag
+    mode = 2;
 
     var timer = setInterval(function() {
         ctx2.clearRect((canvas2.width / 2) - 20, 390, 40, 60); //clear countdown numbers
@@ -430,7 +426,6 @@ function gameEnd() {
 
     mode = 4;
     paused = 1; //set flag
-    level = 1;
 
     ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
     ctx2.font = "bold 36px Arial";
@@ -451,6 +446,7 @@ function gameEnd() {
 
 function gamePaused() {
     var message;
+    paused = 1; //set flag
 
     ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
     ctx2.font = "bold 36px Arial";
@@ -468,6 +464,14 @@ function gamePaused() {
     ctx2.strokeText(message, canvas2.width / 2, 250);
     ctx2.fillText(message, canvas2.width / 2, 250);
 }
+
+// Now instantiate your objects.
+// Place all enemy objects in an array called allEnemies
+// Place the player object in a variable called player
+var player = new Player();
+var allEnemies = [];
+
+gameRestart();
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
