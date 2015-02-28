@@ -3,7 +3,8 @@ var imageHeightRaw = 171,
     imageHeight = imageHeightRaw - imagePaddingTop;
 
 var winLevel = 10,
-    level = -1;
+    level = 0,
+    lastBlockY = 2;
 
 var maxEnemies,
     minSpeed,
@@ -65,8 +66,6 @@ Enemy.prototype.render = function() {
 
 //Reset Enemy position
 Enemy.prototype.reset = function() {
-    var lastBlockY = 2;
-
     this.x = Math.floor(Math.random() * -1010) - imageWidth;
     this.blockY = Math.floor((Math.random() * 3) + 1);
     this.speed = Math.floor((Math.random() * 100) + minSpeed);
@@ -278,20 +277,21 @@ GirlPink.prototype = Object.create(Player.prototype);
 function gameRestart() {
     maxEnemies = 8;
     minSpeed = 20;
-    paused = 1;
+    paused = 0;
     countdown = 0;
     mode = 1;
 
     gameReset();
-    
+
     if(level > 0) gameChoose();
 
-    if(level === -1) level = winLevel; //Testing last level
+    if(level === -1) level = winLevel; //For testing the last level
     else level = 1;
 }
 
 function gameReset() {
     allEnemies = [];
+    if(level > 1) paused = 0;
     player.reset();
 
     for(var i = 0; i < maxEnemies; i++) {
@@ -300,8 +300,6 @@ function gameReset() {
     }
 
     ctx2.clearRect(0, 0, canvas2.width, canvas2.height); //clear top canvas
-    
-    if(level > 1) paused = 0;
 }
 
 function gameChoose() {
