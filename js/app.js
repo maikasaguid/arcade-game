@@ -64,7 +64,7 @@ Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, (this.y - offset));
 };
 
-//Reset Enemy position
+// Reset Enemy position
 Enemy.prototype.reset = function() {
     this.x = Math.floor(Math.random() * -1010) - imageWidth;
     this.blockY = Math.floor((Math.random() * 3) + 1);
@@ -89,6 +89,7 @@ var Player = function() {
     this.sprite = 'images/char-boy.png';
 };
 
+// Checks for collosion or if level was completed
 Player.prototype.update = function() {
     if(!paused) {
         this.x = this.blockX * imageWidth;
@@ -131,6 +132,7 @@ Player.prototype.reset = function() {
     this.blockY = 5;
 };
 
+// Figure out if the Player and Enemy are occupying the same space
 Player.prototype.collisionDetection = function() {
     var playerHitLeft = this.x + this.paddingLeft;
     var playerHitRight = this.x + imageWidth - this.paddingRight;
@@ -154,7 +156,7 @@ Player.prototype.collisionDetection = function() {
 
 Player.prototype.handleInput = function(key) {
     switch(mode) {
-        case 1:
+        case 1: //gameChoose
             switch(key) {
                 case '1':
                     player = new Boy();
@@ -179,7 +181,7 @@ Player.prototype.handleInput = function(key) {
             if(key >= 1 && key <= 6) gameStart();
 
             break;
-        case 2:
+        case 2: //Regular game play
             if(!paused && !countdown) {
                 switch(key) {
                     case 'left':
@@ -274,6 +276,7 @@ var GirlPink = function() {
 };
 GirlPink.prototype = Object.create(Player.prototype);
 
+/* Initialize variables for a fresh new game and calls gameChoose */
 function gameRestart() {
     maxEnemies = 8;
     minSpeed = 20;
@@ -289,6 +292,9 @@ function gameRestart() {
     else level = 1;
 }
 
+/* Clears out enemies array then resets each one as well as the
+ * player
+ */
 function gameReset() {
     allEnemies = [];
     if(level > 1) paused = 0;
@@ -302,6 +308,9 @@ function gameReset() {
     ctx2.clearRect(0, 0, canvas2.width, canvas2.height); //clear top canvas
 }
 
+/* Draws all characters to the top canvas along with a number so the
+ * user can choose what character they would like to play as.
+ */
 function gameChoose() {
     var allCharacters = [
         [
@@ -350,6 +359,18 @@ function gameChoose() {
     ctx2.fillText("Select your character (1-6)", canvas2.width / 2, charY + 35);
 }
 
+/* Set the game up to be played and call the countdown */
+function gameStart() {
+    mode = 2;
+    paused = 0;
+    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
+
+    gameCountdown();
+}
+
+/* Countdown from 3 before each level to ensure enemies are showing up
+ * on screen before the player can make a move.
+ */
 function gameCountdown() {
     var countdownNum = 3;
     countdown = 1; //set flag
@@ -375,14 +396,9 @@ function gameCountdown() {
     }, 1000);
 }
 
-function gameStart() {
-    mode = 2;
-    paused = 0;
-    ctx2.clearRect (0, 0, canvas2.width, canvas2.height); //clear top canvas
-
-    gameCountdown();
-}
-
+/* After the level has been completed figure out if they have won
+ * the game and get input to continue.
+ */
 function gameLevel() {
     var message;
     mode = 3;
@@ -419,6 +435,7 @@ function gameLevel() {
     ctx2.fillText(message, canvas2.width / 2, 250);
 }
 
+/* When the user runs out of lives for the Player */
 function gameEnd() {
     var message;
 
@@ -442,6 +459,7 @@ function gameEnd() {
     ctx2.fillText(message, canvas2.width / 2, 250);
 }
 
+/* Message for a paused game */
 function gamePaused() {
     var message;
     paused = 1; //set flag
@@ -469,7 +487,7 @@ function gamePaused() {
 var player = new Player();
 var allEnemies = [];
 
-gameRestart();
+gameRestart(); // set intial variables, clear player and enemies
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
