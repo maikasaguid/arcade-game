@@ -14,8 +14,9 @@
  * a little simpler to work with.
  */
 
-var numRows = 6,
-    numCols = 5;
+var numRows = 6, // min rows is 4
+    numCols = 5,
+    stoneRows = numRows - 3; // 3 = 1 top row + 2 grass rows
 
 var imageWidth = 101,
     imageHeightCanvas = 101;
@@ -114,15 +115,16 @@ var Engine = (function(global) {
         /* This array holds the relative URL to the image used
          * for that particular row of the game level.
          */
-        var rowImages = [
-                'images/water-block.png',   // Top row is water
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png',   // Row 1 of 2 of grass
-                'images/grass-block.png'    // Row 2 of 2 of grass
-            ],
-            row, col;
+        var rowImages = ['images/water-block.png'], // Top row is water 
+            row,
+            col;
+
+        for(var i=0; i<stoneRows; i++) {
+            rowImages.push('images/stone-block.png');
+        }
+
+        rowImages.push('images/grass-block.png'); // Row 1 of 2 of grass
+        rowImages.push('images/grass-block.png'); // Row 2 of 2 of grass
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -164,7 +166,7 @@ var Engine = (function(global) {
      * those sorts of things. It's only called once by the init() method.
      */
     function reset() {
-        gameChoose();
+        gameChoose(); //show initial character select with caching
     }
 
     /* Go ahead and load all of the images we know we're going to need to
