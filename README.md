@@ -1,7 +1,7 @@
 p3
 ===============================
 
-Udacity Front-End Web Developer Nanodegree Project 3
+Udacity Front-End Web Developer Nanodegree Project 3: Classic Arcade Game Clone
 
 ##Introduction
 Get your character across the stone road and into the water without getting hit by a bug. As you make your way up the levels, mind your lives, as the bugs increase in speed an frequency.
@@ -22,3 +22,8 @@ Please set the variable level in app.js to -1 in order to quickly test the win c
     http://stackoverflow.com/questions/6220300/jquery-keyup-how-do-i-prevent-the-default-behavior-of-the-arrow-up-down-an
 3.  The Final Countdown: Using JavaScript’s setInterval + clearInterval Methods
     http://vaidehijoshi.github.io/blog/2015/01/06/the-final-countdown-using-javascripts-setinterval-plus-clearinterval-methods/
+
+## How to Contribute
+1. Fork the latest code.
+2. Make your changes.
+3. Send me a pull request.
