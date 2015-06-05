@@ -4,15 +4,14 @@ Frogger Bugger
 Udacity Front-End Web Developer Nanodegree Project 3: Classic Arcade Game Clone
 
 ##Introduction
-Get your character across the stone road and into the water without getting hit by a bug. As you make your way up the levels, mind your lives, as the bugs increase in speed an frequency.
+Get your character across the stone road and into the water without getting hit by a bug. As you make your way up the levels, mind your lives, as the bugs increase in speed and frequency. This Project is similiar to the game Frogger but is built in JavaScript and utilizes HTML5 Canvas.
 
 ##Instructions
-1. Select your character, but choose wisely, as some are wider than others and thus have more lives.
-2. Navigate through the bugs to get to the water by using your left hand (W-up, D-right, S-down, A-left) or right hand arrow buttons.
-3. You win the game once you reach the water in the 10th level.
-
-##Instructions for Reviewers
-Please set the variable level in app.js to -1 in order to quickly test the win case.
+1. View the live game here: https://rawgit.com/maikasaguid/arcade-game/master/index.html
+2. Select your character, but choose wisely, as some are wider than others and thus have more lives.
+3. Navigate through the bugs to get to the water by using your left hand (W-up, D-right, S-down, A-left) or right hand arrow buttons.
+4. You win the game once you reach the water in the 10th level.
+5. If you'd like to quickly test the win case, set the variable level in app.js to -1.
 
 ##Resources
 1.  Keyboard Keys and Key Code Values
